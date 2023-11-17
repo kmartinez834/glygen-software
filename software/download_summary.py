@@ -42,6 +42,7 @@ def main():
     downloads = []
     bco_path = "/data/shared/glygen/releases/data/current/jsondb/bcodb/*.json"
     output = get_inputs(bco_path)
+    user = os.getlogin()
     
     resource_dict = {}
     path = "/data/projects/glygen/downloads/"
@@ -124,11 +125,15 @@ def main():
         value["file_name"] = key
         new_list.append([value[i] for i in value])
 
-    with open('/software/glygen/logs/download_summary.csv', 'w') as out_file:
+    with open(f'/data/projects/glygen/generated/misc/{user}_download_summary.csv', 'w') as out_file:
         writer = csv.writer(out_file, delimiter = ',', quoting=csv.QUOTE_ALL)
         writer.writerows(new_list)
 
-    print ('download_summary.csv saved to /software/glygen/logs/')
+    
+    cmd = f'chmod 775 /data/projects/glygen/generated/misc/download_summary_{user}.csv'
+    os.system(cmd)
+
+    print (f'{user}_download_summary.csv saved at /data/projects/glygen/generated/misc/')
 
 if __name__ == '__main__':
     main()
