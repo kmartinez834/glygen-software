@@ -67,8 +67,7 @@ def main():
     
     json_data = json.dumps(mapping_list, indent=4)
 
-    # Writing to sample.json
-    out_file = '/data/projects/glygen/generated/misc/enzyme_mapping.json'
+    out_file = '/data/projects/glygen/downloads/export_files/for_uga/enzyme_mapping.json'
     with open(out_file, "w") as outfile:
         outfile.write(json_data)
 
