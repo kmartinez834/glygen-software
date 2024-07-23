@@ -63,20 +63,20 @@ def main():
     json_data = json.dumps(entry_dict, indent=4)
 
     # Writing to sample.json
-    out_file = '/home/karinamartinez/carbbank.json'
+    out_file = 'carbbank.json'
     with open(out_file, "w") as outfile:
         outfile.write(json_data)
 
     print (f"Saved {out_file}")
 
-    # write to csv file
+    # Write to csv file
     headers = []
     for value in entry_dict.values():
         for header in value.keys():
             if header not in headers:
                 headers.append(header)
 
-    out_file = '/home/karinamartinez/carbbank.csv'
+    out_file = 'carbbank.csv'
     with open(out_file, "w") as outfile:
         csv_writer = csv.writer(outfile,quoting=csv.QUOTE_ALL)
         count = 0
@@ -93,8 +93,6 @@ def main():
             csv_writer.writerow(sorted_dict.values())
 
     print (f"Saved {out_file}")
-            
-    
 
 if __name__ == '__main__':
     main()
