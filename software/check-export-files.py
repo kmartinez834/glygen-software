@@ -13,15 +13,16 @@ def file_search (row, data_dir):
     if search_file in files:
         return
     else:
-        print (f"ERROR: {search_file} not found in {data_dir + search_path}")
+        print (f"ERROR: {search_file} not found in {data_dir}{search_path}")
         return
 
 
 
 def main():
 
-    dataset_list = "/data/projects/glygen/generated/misc/files4nathan.csv"
-    data_dir = "/data/projects/glygen/"
+    user_id = os.getlogin()
+    dataset_list = f"/home/{user_id}/glygen-glycan-pipeline/files4nathan.csv"
+    data_dir = "/data/projects/glygen/downloads/"
 
     with open(dataset_list, "r") as in_file:
         infile = csv.reader(in_file, delimiter=",")

@@ -22,9 +22,9 @@ def main():
                 dup_list.append(file) 
 
         file_num += 1
-        print (f'Checked {file_num}/{len(file_list)} files')
+        #print (f'Checked {file_num}/{len(file_list)} files')
             
-    print (len(dup_list))
+    #print (len(dup_list))
     print (dup_list)
 
 if __name__ == '__main__':

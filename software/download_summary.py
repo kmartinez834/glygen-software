@@ -29,17 +29,16 @@ def get_inputs (path):
 
 # Get file size, creation time and permissions
 def get_stats (file):
-            output = os.stat(file)
-            size = output.st_size
-            creation_time = output.st_ctime
-            permissions = oct(output.st_mode)[-3:]
-            return size, creation_time, permissions
+    output = os.stat(file)
+    size = output.st_size
+    creation_time = output.st_ctime
+    permissions = oct(output.st_mode)[-3:]
+    return size, creation_time, permissions
 
 
 #######################################
 def main():
 
-    downloads = []
     bco_path = "/data/shared/glygen/releases/data/current/jsondb/bcodb/*.json"
     output = get_inputs(bco_path)
     user = os.getlogin()
@@ -49,11 +48,12 @@ def main():
 
     # Create dictionary with file names as keys
     for file in output:
-        filepath = file.split("/downloads/")[1].split("/")
+        filepath = file.split("/ln2downloads/")[1].split("/")
         resource_name, subfolders, file_name = filepath[0], filepath[1:-1], filepath[-1]
-        previous_folder = path + file.split("/downloads/")[1].split(file_name)[0]
+        previous_folder = path + file.split("/ln2downloads/")[1].split(file_name)[0]
 
-        resource_dict[file_name] = {"file_name":"",
+        resource_dict[file_name] = {"resource":resource_name,
+                                    "file_name":"",
                                     "previous_folder":previous_folder, 
                                     "current_folder":"", 
                                     "previous_ctime":"",
@@ -88,18 +88,19 @@ def main():
 
         # check to make sure symbolic links are relative and not absolute
         if len(value["current_folder"]) == 0:
-            value["folder_status"], value["current_folder"] = "Same folder", value["previous_folder"]
-        elif len(value["previous_folder"]) != len(value["current_folder"]):
-            value["folder_status"] = f"Check current folder path length: {value['current_folder']}"
+            value["folder_status"], value["current_folder"] = "same", value["previous_folder"]
+        elif value["previous_folder"].find("/") != value["current_folder"].find("/"):
+        #elif len(value["previous_folder"]) != len(value["current_folder"]):
+            value["folder_status"] = f"Current and previous folder path lengths do not match: \n{value['current_folder']}\n{value['previous_folder']}"
         elif value["previous_folder"] == value["current_folder"]:
             value["folder_status"] = "same"
         else:
             value["folder_status"] = "different"
 
         # make sure current path exists
-        if os.path.exists(value["current_folder"] + key) == True:
+        if os.path.exists(value["current_folder"] + key) == True and os.path.exists(value["previous_folder"] + key) == True:
             # check if file is the same as previous
-            value["previous_size"], value["previous_ctime"], permissions = get_stats(value["previous_folder"] + key)
+            value["previous_size"], value["previous_ctime"], __ = get_stats(value["previous_folder"] + key)
             value["current_size"], value["current_ctime"], value["permissions_flag"] = get_stats(value["current_folder"] + key)
             if value["permissions_flag"] == "775":
                 value["permissions_flag"] = "" 
@@ -119,21 +120,25 @@ def main():
             value["previous_ctime"] = datetime.datetime.fromtimestamp(value["previous_ctime"]).strftime("%m/%d/%Y, %H:%M:%S")
             value["current_ctime"] = datetime.datetime.fromtimestamp(value["current_ctime"]).strftime("%m/%d/%Y, %H:%M:%S")
 
-        else:
+        elif os.path.exists(value["current_folder"] + key) == False:
             value["error_flag"] = f"ERROR: Path not valid, check folder and file name: {value['current_folder']}{key}"
+
+        elif os.path.exists(value["previous_folder"] + key) == False:
+            value["error_flag"] = f"ERROR: Path not valid, check folder and file name: {value['previous_folder']}{key}"
 
         value["file_name"] = key
         new_list.append([value[i] for i in value])
 
-    with open(f'/data/projects/glygen/generated/misc/{user}_download_summary.csv', 'w') as out_file:
+
+    with open(f'logs/{user}_download_summary.csv', 'w') as out_file:
         writer = csv.writer(out_file, delimiter = ',', quoting=csv.QUOTE_ALL)
         writer.writerows(new_list)
 
     
-    cmd = f'chmod 775 /data/projects/glygen/generated/misc/download_summary_{user}.csv'
+    cmd = f'chmod 775 logs/{user}_download_summary.csv'
     os.system(cmd)
 
-    print (f'{user}_download_summary.csv saved at /data/projects/glygen/generated/misc/')
+    print (f'Saved logs/{user}_download_summary.csv ')
 
 if __name__ == '__main__':
     main()
